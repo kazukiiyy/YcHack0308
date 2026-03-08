@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BridgeVault Test UI - approveUnlock</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0a0a0f;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #13131a;
+      border: 1px solid #2d2d3d;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 0 40px rgba(99,102,241,0.08);
+    }
+
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99,102,241,0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: #818cf8;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .contract-info {
+      background: #0d0d14;
+      border: 1px solid #1e1e2e;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 12px;
+    }
+
+    .contract-info .label {
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .contract-info .address {
+      color: #818cf8;
+      font-family: 'SF Mono', monospace;
+      word-break: break-all;
+    }
+
+    .wallet-section {
+      margin-bottom: 24px;
+    }
+
+    .btn-connect {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-connect:hover { opacity: 0.85; }
+    .btn-connect:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .wallet-status {
+      display: none;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+
+    .wallet-status.show { display: flex; align-items: center; gap: 8px; }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .wallet-addr {
+      color: #10b981;
+      font-family: 'SF Mono', monospace;
+      word-break: break-all;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #1e1e2e;
+      margin: 24px 0;
+    }
+
+    .form-section h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .type-hint {
+      font-size: 11px;
+      color: #475569;
+      font-family: 'SF Mono', monospace;
+      margin-left: 6px;
+    }
+
+    input {
+      width: 100%;
+      background: #0d0d14;
+      border: 1px solid #2d2d3d;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #e2e8f0;
+      font-size: 13px;
+      font-family: 'SF Mono', monospace;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus { border-color: #6366f1; }
+    input::placeholder { color: #334155; }
+
+    .field-hint {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 4px;
+    }
+
+    .btn-send {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+
+    .btn-send:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .btn-send:active:not(:disabled) { transform: translateY(0); }
+    .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .result {
+      margin-top: 20px;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .result.show { display: block; }
+
+    .result.success {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.25);
+      color: #10b981;
+    }
+
+    .result.error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #f87171;
+    }
+
+    .result.pending {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: #fbbf24;
+    }
+
+    .result-label {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .result-value {
+      font-family: 'SF Mono', monospace;
+      word-break: break-all;
+      font-size: 12px;
+    }
+
+    .etherscan-link {
+      display: inline-block;
+      margin-top: 8px;
+      color: #818cf8;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .etherscan-link:hover { text-decoration: underline; }
+
+    .network-warning {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #fbbf24;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .network-warning.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        Sepolia Testnet
+      </div>
+      <h1>BridgeVault Test UI</h1>
+      <p class="subtitle">approveUnlock のテスト送信</p>
+    </div>
+
+    <div class="contract-info">
+      <div class="label">📄 BridgeVault Contract</div>
+      <div class="address">0xE69606565988E8A2bC9048ec22645670164Fab96</div>
+    </div>
+
+    <!-- Wallet Connect -->
+    <div class="wallet-section">
+      <button class="btn-connect" id="btnConnect" onclick="connectWallet()">
+        🦊 MetaMaskに接続
+      </button>
+      <div class="wallet-status" id="walletStatus">
+        <div class="status-dot"></div>
+        <span>接続済み: </span>
+        <span class="wallet-addr" id="walletAddr"></span>
+      </div>
+    </div>
+
+    <div class="network-warning" id="networkWarning">
+      ⚠️ ネットワークをSepoliaに切り替えてください (Chain ID: 11155111)
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Form -->
+    <div class="form-section">
+      <h2>approveUnlock パラメータ</h2>
+
+      <div class="field">
+        <label>
+          privateTxHash
+          <span class="type-hint">bytes32</span>
+        </label>
+        <input
+          id="privateTxHash"
+          type="text"
+          placeholder="0x... (Private ChainのburnのtxHash)"
+        />
+        <div class="field-hint">Quorum上のWithdrawRequested txHashを指定</div>
+      </div>
+
+      <div class="field">
+        <label>
+          recipient
+          <span class="type-hint">address</span>
+        </label>
+        <input
+          id="recipient"
+          type="text"
+          placeholder="0x... (USDCを受け取るEthereumアドレス)"
+        />
+      </div>
+
+      <div class="field">
+        <label>
+          amount
+          <span class="type-hint">uint256 (6 decimals)</span>
+        </label>
+        <input
+          id="amountUSDC"
+          type="number"
+          placeholder="例: 100.5"
+          step="0.000001"
+          min="0"
+        />
+        <div class="field-hint">USDCの量（人間が読める単位で入力、例: 100 = 100 USDC）</div>
+      </div>
+
+      <button class="btn-send" id="btnSend" onclick="sendTx()" disabled>
+        🚀 approveUnlock を送信
+      </button>
+    </div>
+
+    <!-- Result -->
+    <div class="result" id="result">
+      <div class="result-label" id="resultLabel"></div>
+      <div class="result-value" id="resultValue"></div>
+      <a class="etherscan-link" id="etherscanLink" href="#" target="_blank" style="display:none">
+        → Etherscanで確認
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // ABI for approveUnlock only
+    const ABI = [
+      {
+        name: 'approveUnlock',
+        type: 'function',
+        stateMutability: 'nonpayable',
+        inputs: [
+          { name: 'privateTxHash', type: 'bytes32' },
+          { name: 'recipient',     type: 'address' },
+          { name: 'amount',        type: 'uint256' }
+        ],
+        outputs: []
+      }
+    ];
+
+    const CONTRACT_ADDRESS = '0xE69606565988E8A2bC9048ec22645670164Fab96';
+    const SEPOLIA_CHAIN_ID = '0xaa36a7'; // 11155111
+
+    // Minimal ABI encoding helpers (no ethers.js needed)
+    function encodeBytes32(hex) {
+      // Ensure 0x prefix and pad to 32 bytes
+      const clean = hex.startsWith('0x') ? hex.slice(2) : hex;
+      return clean.padEnd(64, '0');
+    }
+
+    function encodeAddress(addr) {
+      const clean = addr.startsWith('0x') ? addr.slice(2) : addr;
+      return clean.padStart(64, '0');
+    }
+
+    function encodeUint256(val) {
+      const bn = BigInt(val);
+      return bn.toString(16).padStart(64, '0');
+    }
+
+    function buildCalldata(privateTxHash, recipient, amount) {
+      // Function selector: keccak256("approveUnlock(bytes32,address,uint256)") first 4 bytes
+      // Precomputed: 0x...  We'll compute it inline
+      const selector = '0x' + getSelector('approveUnlock(bytes32,address,uint256)');
+      const p1 = encodeBytes32(privateTxHash);
+      const p2 = encodeAddress(recipient);
+      const p3 = encodeUint256(amount);
+      return selector + p1 + p2 + p3;
+    }
+
+    // Simple keccak256 selector computation via eth_call trick won't work,
+    // so we hardcode it (precomputed)
+    //   keccak256("approveUnlock(bytes32,address,uint256)") = ?
+    // We'll compute via a simple fetch to public RPC
+    function getSelector(sig) {
+      // approveUnlock(bytes32,address,uint256)
+      // Precompute using SHA3/Keccak - first 4 bytes
+      // We use a lookup table approach since we know the function
+      // keccak256 of "approveUnlock(bytes32,address,uint256)" = 0xc9bb2b...
+      // Let's compute it dynamically using eth_call with eth_getCode trick
+      // Actually, let's just use the web3 approach with manual ABI encoding
+      return computeSelector(sig);
+    }
+
+    function computeSelector(sig) {
+      // Use the cached selector for approveUnlock(bytes32,address,uint256)
+      // keccak256("approveUnlock(bytes32,address,uint256)")[0:4]
+      // = first 4 bytes of keccak256
+      // We compute using SubtleCrypto
+      return _cachedSelector;
+    }
+
+    let _cachedSelector = null;
+
+    async function computeSelectorAsync(sig) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(sig);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      // SHA256 != Keccak256, so we need another approach
+      // Use eth_call to keccak256 via the node, or use a precomputed value
+      // Precomputed offline: keccak256("approveUnlock(bytes32,address,uint256)")
+      // = 0xee22610b...  let me just hardcode this
+      return null;
+    }
+
+    // Precomputed: keccak256("approveUnlock(bytes32,address,uint256)") first 4 bytes
+    // Computed offline: 0xee22610b (need to verify)
+    // Let's use ethers.js from CDN to be safe
+  </script>
+
+  <!-- Use ethers.js v6 for proper encoding -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+
+  <script>
+    let userAddress = null;
+
+    async function connectWallet() {
+      if (typeof window.ethereum === 'undefined') {
+        showResult('error', 'エラー', 'MetaMaskがインストールされていません');
+        return;
+      }
+
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userAddress = accounts[0];
+
+        // Check network
+        await checkNetwork();
+
+        document.getElementById('walletStatus').classList.add('show');
+        document.getElementById('walletAddr').textContent = userAddress;
+        document.getElementById('btnConnect').style.display = 'none';
+        document.getElementById('btnSend').disabled = false;
+
+        // Listen for account/network changes
+        window.ethereum.on('accountsChanged', (accs) => {
+          userAddress = accs[0];
+          document.getElementById('walletAddr').textContent = userAddress;
+        });
+
+        window.ethereum.on('chainChanged', () => window.location.reload());
+
+      } catch (err) {
+        showResult('error', '接続失敗', err.message);
+      }
+    }
+
+    async function checkNetwork() {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const warning = document.getElementById('networkWarning');
+      if (chainId !== SEPOLIA_CHAIN_ID) {
+        warning.classList.add('show');
+        // Try to switch
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: SEPOLIA_CHAIN_ID }],
+          });
+          warning.classList.remove('show');
+        } catch (e) {
+          // User rejected or chain not added
+        }
+      } else {
+        warning.classList.remove('show');
+      }
+    }
+
+    async function sendTx() {
+      const privateTxHashRaw = document.getElementById('privateTxHash').value.trim();
+      const recipient = document.getElementById('recipient').value.trim();
+      const amountStr = document.getElementById('amountUSDC').value.trim();
+
+      // Validation
+      if (!privateTxHashRaw || !recipient || !amountStr) {
+        showResult('error', '入力エラー', '全てのフィールドを入力してください');
+        return;
+      }
+
+      if (!recipient.match(/^0x[0-9a-fA-F]{40}$/)) {
+        showResult('error', '入力エラー', 'recipient のアドレス形式が無効です');
+        return;
+      }
+
+      if (!privateTxHashRaw.match(/^0x[0-9a-fA-F]{1,64}$/)) {
+        showResult('error', '入力エラー', 'privateTxHash の形式が無効です（0x + 最大64文字の16進数）');
+        return;
+      }
+
+      // Convert amount to uint256 (6 decimals)
+      const amountFloat = parseFloat(amountStr);
+      if (isNaN(amountFloat) || amountFloat <= 0) {
+        showResult('error', '入力エラー', 'amount は正の数を入力してください');
+        return;
+      }
+      const amountWei = BigInt(Math.round(amountFloat * 1_000_000));
+
+      // Pad the privateTxHash to bytes32
+      const privateTxHash = privateTxHashRaw.startsWith('0x')
+        ? privateTxHashRaw
+        : '0x' + privateTxHashRaw;
+      const paddedHash = privateTxHash.padEnd(66, '0');
+
+      showResult('pending', '送信中...', 'MetaMaskの承認を待っています');
+
+      try {
+        // Build calldata using ethers.js
+        const iface = new ethers.Interface(ABI);
+        const calldata = iface.encodeFunctionData('approveUnlock', [
+          ethers.zeroPadBytes(paddedHash, 32),
+          recipient,
+          amountWei
+        ]);
+
+        document.getElementById('btnSend').disabled = true;
+
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: userAddress,
+            to: CONTRACT_ADDRESS,
+            data: calldata,
+            // Let MetaMask estimate gas
+          }]
+        });
+
+        showResult(
+          'pending',
+          '⏳ トランザクション送信済み',
+          txHash
+        );
+        document.getElementById('etherscanLink').href =
+          `https://sepolia.etherscan.io/tx/${txHash}`;
+        document.getElementById('etherscanLink').style.display = 'inline';
+
+        // Wait for confirmation
+        waitForConfirmation(txHash);
+
+      } catch (err) {
+        document.getElementById('btnSend').disabled = false;
+        if (err.code === 4001) {
+          showResult('error', 'キャンセル', 'MetaMaskで拒否されました');
+        } else {
+          showResult('error', 'エラー', err.message || String(err));
+        }
+      }
+    }
+
+    async function waitForConfirmation(txHash) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      try {
+        showResult('pending', '⏳ 確認待ち...', txHash);
+        document.getElementById('etherscanLink').href =
+          `https://sepolia.etherscan.io/tx/${txHash}`;
+        document.getElementById('etherscanLink').style.display = 'inline';
+
+        const receipt = await provider.waitForTransaction(txHash, 1);
+
+        document.getElementById('btnSend').disabled = false;
+
+        if (receipt.status === 1) {
+          showResult(
+            'success',
+            '✅ approveUnlock 成功！',
+            `TX: ${txHash}\nBlock: ${receipt.blockNumber}\nGas Used: ${receipt.gasUsed.toString()}`
+          );
+        } else {
+          showResult('error', '❌ トランザクション失敗', `TX: ${txHash}`);
+        }
+        document.getElementById('etherscanLink').href =
+          `https://sepolia.etherscan.io/tx/${txHash}`;
+        document.getElementById('etherscanLink').style.display = 'inline';
+      } catch (e) {
+        document.getElementById('btnSend').disabled = false;
+        showResult('error', '確認エラー', e.message);
+      }
+    }
+
+    function showResult(type, label, value) {
+      const el = document.getElementById('result');
+      el.className = `result show ${type}`;
+      document.getElementById('resultLabel').textContent = label;
+      document.getElementById('resultValue').textContent = value;
+      if (type !== 'pending') {
+        document.getElementById('etherscanLink').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
