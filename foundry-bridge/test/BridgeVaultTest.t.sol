@@ -2,10 +2,16 @@
 pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
+import {Vm} from "forge-std/Vm.sol";
 import {BridgeVault} from "../src/BridgeVault.sol";
 import {MockUSDC} from "../src/MockUSDC.sol";
 
 contract BridgeVaultTest is Test {
+    // expectEmit用にイベントを再宣言
+    event Locked(address indexed sender, uint256 amount, bytes32 indexed privateChainRecipient, uint256 indexed lockId);
+    event Unlocked(bytes32 indexed privateTxHash, address indexed recipient, uint256 amount);
+    event UnlockApproved(bytes32 indexed privateTxHash, address indexed relayer, uint256 approvalCount, uint256 threshold);
+
     BridgeVault public vault;
     MockUSDC    public usdc;
 
@@ -73,7 +79,7 @@ contract BridgeVaultTest is Test {
     function test_Lock_EmitsLockedEvent() public {
         // expectEmit: (checkTopic1, checkTopic2, checkTopic3, checkData)
         vm.expectEmit(true, true, true, true);
-        emit BridgeVault.Locked(user, _usdc(500), PRIVATE_RECIPIENT, 1);
+        emit Locked(user, _usdc(500), PRIVATE_RECIPIENT, 1);
 
         vm.prank(user);
         vault.lock(_usdc(500), PRIVATE_RECIPIENT);
@@ -84,12 +90,12 @@ contract BridgeVaultTest is Test {
 
         // 1回目: lockId = 1
         vm.expectEmit(true, false, false, true);
-        emit BridgeVault.Locked(user, _usdc(100), PRIVATE_RECIPIENT, 1);
+        emit Locked(user, _usdc(100), PRIVATE_RECIPIENT, 1);
         vault.lock(_usdc(100), PRIVATE_RECIPIENT);
 
         // 2回目: lockId = 2
         vm.expectEmit(true, false, false, true);
-        emit BridgeVault.Locked(user, _usdc(200), PRIVATE_RECIPIENT, 2);
+        emit Locked(user, _usdc(200), PRIVATE_RECIPIENT, 2);
         vault.lock(_usdc(200), PRIVATE_RECIPIENT);
 
         vm.stopPrank();
@@ -150,7 +156,7 @@ contract BridgeVaultTest is Test {
         public withLockedUSDC(_usdc(1000))
     {
         vm.expectEmit(true, true, false, true);
-        emit BridgeVault.UnlockApproved(PRIVATE_TX_HASH, relayer1, 1, 2);
+        emit UnlockApproved(PRIVATE_TX_HASH, relayer1, 1, 2);
 
         vm.prank(relayer1);
         vault.approveUnlock(PRIVATE_TX_HASH, user, _usdc(500));
@@ -177,7 +183,7 @@ contract BridgeVaultTest is Test {
         vault.approveUnlock(PRIVATE_TX_HASH, user, _usdc(500));
 
         vm.expectEmit(true, true, false, true);
-        emit BridgeVault.Unlocked(PRIVATE_TX_HASH, user, _usdc(500));
+        emit Unlocked(PRIVATE_TX_HASH, user, _usdc(500));
 
         vm.prank(relayer2);
         vault.approveUnlock(PRIVATE_TX_HASH, user, _usdc(500));
@@ -329,7 +335,7 @@ contract BridgeVaultTest is Test {
 
         // unpause後は通常通り動作
         vm.expectEmit(true, false, false, false);
-        emit BridgeVault.Locked(user, _usdc(100), PRIVATE_RECIPIENT, 1);
+        emit Locked(user, _usdc(100), PRIVATE_RECIPIENT, 1);
         vm.prank(user);
         vault.lock(_usdc(100), PRIVATE_RECIPIENT);
     }
@@ -369,10 +375,12 @@ contract BridgeVaultTest is Test {
         // topic[2] = privateChainRecipient (indexed)
         assertEq(lockedLog.topics[2], PRIVATE_RECIPIENT);
 
-        // data = amount, lockId
-        (uint256 amount, uint256 lockId) = abi.decode(lockedLog.data, (uint256, uint256));
+        // data = amount のみ（lockIdはindexedなのでtopic[3]に入る）
+        uint256 amount = abi.decode(lockedLog.data, (uint256));
         assertEq(amount, _usdc(300));
-        assertEq(lockId, 1);
+
+        // topic[3] = lockId (indexed)
+        assertEq(lockedLog.topics[3], bytes32(uint256(1)));
     }
 
     function test_Event_UnlockedEventHasCorrectTopicsAndData()

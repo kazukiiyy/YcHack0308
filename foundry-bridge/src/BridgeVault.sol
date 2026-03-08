@@ -105,7 +105,7 @@ contract BridgeVault is AccessControl, ReentrancyGuard, Pausable {
     ) {
         require(_usdc != address(0), "BridgeVault: zero usdc address");
         require(_relayers.length >= _threshold, "BridgeVault: threshold too high");
-        require(_threshold > 0, "BridgeVault: threshold must be > 0");
+        // threshold=0はデプロイ後にsetThreshold()で設定する用途を許可
 
         usdc = IERC20(_usdc);
         threshold = _threshold;
