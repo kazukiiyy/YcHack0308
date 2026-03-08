@@ -4041,3 +4041,9 @@ INFO [03-08|08:23:05.070] Commit new mining work                   number=2058 s
 WARN [03-08|08:23:05.070] Block sealing failed                     err=unauthorized
 INFO [03-08|08:23:10.047] QBFT: initialize new round               address=0x13A52aaB892e1322e8b52506276363d4754c122e current.round=0 current.sequence=2058 target.round=0 lastProposal.number=2058 lastProposal.hash=d854b9..ea33d7
 INFO [03-08|08:23:10.048] Commit new mining work                   number=2059 sealhash=3d5e79..e14dce uncles=0 txs=0 gas=0         fees=0 elapsed=1.281ms
+INFO [03-08|08:23:15.063] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed=3.539ms     mgasps=0.000   number=2059 hash=8f32e0..a12c03 dirty=14.16KiB
+INFO [03-08|08:23:15.065] QBFT: initialize new round               address=0x13A52aaB892e1322e8b52506276363d4754c122e current.round=0 current.sequence=2059 target.round=0 lastProposal.number=2059 lastProposal.hash=8f32e0..a12c03
+INFO [03-08|08:23:20.048] QBFT: start new round                    address=0x13A52aaB892e1322e8b52506276363d4754c122e old.round=0  old.sequence=2060 old.state="Accept request" old.proposer=0x98C1334496614aED49d2E81526D089f7264fED9C next.round=0 next.seq=2061 next.proposer=0xcE412f988377e31F4d0fF12d74df73B51C42d0cA next.valSet="[0x27A97C9AaF04f18f3014c32e036dD0Ac76Da5f18 0x93917cADBace5dFCE132B991732c6Cda9bcC5B8a 0x98C1334496614aED49d2E81526D089f7264fED9C 0xcE412f988377e31F4d0fF12d74df73B51C42d0cA]" next.size=4 next.IsProposer=false
+WARN [03-08|08:23:20.048] Block sealing failed                     err=unauthorized
+INFO [03-08|08:23:25.045] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed=6.556ms     mgasps=0.000   number=2061 hash=702111..e3a7d8 dirty=14.16KiB
+INFO [03-08|08:23:30.563] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed=2.274ms     mgasps=0.000   number=2062 hash=f80f1d..ff287b dirty=14.16KiB
