@@ -25,8 +25,15 @@ class _BankDashboardPageState extends State<BankDashboardPage> {
       child: Scaffold(
         body: Row(
           children: [
-            AppSidebar(selectedIndex: _navIndex, onSelect: (i) => setState(() => _navIndex = i)),
-            const VerticalDivider(width: 1, thickness: 1, color: BankColors.border),
+            AppSidebar(
+              selectedIndex: _navIndex,
+              onSelect: (i) => setState(() => _navIndex = i),
+            ),
+            const VerticalDivider(
+              width: 1,
+              thickness: 1,
+              color: BankColors.border,
+            ),
             Expanded(
               child: StreamBuilder<DashboardSnapshot>(
                 stream: widget.dataSource.snapshots,
@@ -45,9 +52,19 @@ class _BankDashboardPageState extends State<BankDashboardPage> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(flex: 3, child: BridgeMonitor(transactions: data?.recentTransactions ?? [])),
+                              Expanded(
+                                flex: 3,
+                                child: BridgeMonitor(
+                                  transactions: data?.recentTransactions ?? [],
+                                ),
+                              ),
                               const SizedBox(width: 24),
-                              Expanded(flex: 1, child: StMarketAllocation(allocations: demoAllocations)),
+                              Expanded(
+                                flex: 1,
+                                child: StMarketAllocation(
+                                  allocations: demoAllocations,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -69,11 +86,20 @@ class _BankDashboardPageState extends State<BankDashboardPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Treasury Gateway',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700, fontSize: 22)),
+            Text(
+              'Treasury Gateway',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                fontSize: 22,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text('USDT → Security Token Bridge  |  Liquidity Dashboard',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 13)),
+            Text(
+              'USDT → Security Token Bridge  |  Liquidity Dashboard',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 13),
+            ),
           ],
         ),
         const Spacer(),
@@ -86,9 +112,16 @@ class _BankDashboardPageState extends State<BankDashboardPage> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.calendar_today_rounded, size: 14, color: BankColors.textSecondary),
+              const Icon(
+                Icons.calendar_today_rounded,
+                size: 14,
+                color: BankColors.textSecondary,
+              ),
               const SizedBox(width: 6),
-              Text('Last 24 hours', style: bankMono(size: 12, color: BankColors.textSecondary)),
+              Text(
+                'Last 24 hours',
+                style: bankMono(size: 12, color: BankColors.textSecondary),
+              ),
             ],
           ),
         ),
@@ -97,7 +130,9 @@ class _BankDashboardPageState extends State<BankDashboardPage> {
   }
 
   Widget _buildKpiRow(DashboardSnapshot? data) {
-    final inflowStr = data == null ? '\$0' : '\$${_fmt(data.totalLiquidityInflow)}';
+    final inflowStr = data == null
+        ? '\$0'
+        : '\$${_fmt(data.totalLiquidityInflow)}';
     final activeStr = data == null ? '0' : '${data.activeBridgeTransactions}';
     final volumeStr = data == null ? '\$0' : '\$${_fmt(data.volume24h)}';
     final sparkline = data?.inflowSparkline ?? List.filled(12, 0.0);
@@ -116,11 +151,23 @@ class _BankDashboardPageState extends State<BankDashboardPage> {
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: KpiCard(title: 'Active Bridge Txns', value: activeStr, subtitle: 'Pending settlement', icon: Icons.sync_rounded, iconColor: BankColors.accent),
+          child: KpiCard(
+            title: 'Active Bridge Txns',
+            value: activeStr,
+            subtitle: 'Pending settlement',
+            icon: Icons.sync_rounded,
+            iconColor: BankColors.accent,
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: KpiCard(title: '24h Bridge Volume', value: volumeStr, subtitle: 'Daily throughput', icon: Icons.bar_chart_rounded, iconColor: BankColors.amber),
+          child: KpiCard(
+            title: '24h Bridge Volume',
+            value: volumeStr,
+            subtitle: 'Daily throughput',
+            icon: Icons.bar_chart_rounded,
+            iconColor: BankColors.amber,
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -132,9 +179,15 @@ class _BankDashboardPageState extends State<BankDashboardPage> {
             trailing: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                NetworkStatusIndicator(label: 'Public Node (Base)', isOnline: true),
+                NetworkStatusIndicator(
+                  label: 'Public Node (Base)',
+                  isOnline: true,
+                ),
                 SizedBox(height: 6),
-                NetworkStatusIndicator(label: 'Private Ledger (Progmat)', isOnline: true),
+                NetworkStatusIndicator(
+                  label: 'Private Ledger (Progmat)',
+                  isOnline: true,
+                ),
               ],
             ),
           ),

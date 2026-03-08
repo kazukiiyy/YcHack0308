@@ -15,20 +15,38 @@ class MarketPage extends StatelessWidget {
         title: Row(
           children: [
             Container(
-              width: 32, height: 32,
-              decoration: BoxDecoration(color: EndUserColors.accent, borderRadius: BorderRadius.circular(8)),
-              child: const Icon(Icons.account_balance, size: 18, color: Colors.white),
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: EndUserColors.accent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.account_balance,
+                size: 18,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 10),
-            const Text('ST Market', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+            const Text(
+              'ST Market',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+            ),
           ],
         ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Chip(
-              avatar: const Icon(Icons.account_balance_wallet_rounded, size: 16, color: EndUserColors.accent),
-              label: Text('50,000 USDT', style: endUserMono(size: 12, weight: FontWeight.w600)),
+              avatar: const Icon(
+                Icons.account_balance_wallet_rounded,
+                size: 16,
+                color: EndUserColors.accent,
+              ),
+              label: Text(
+                '50,000 USDT',
+                style: endUserMono(size: 12, weight: FontWeight.w600),
+              ),
               backgroundColor: EndUserColors.surfaceVariant,
               side: const BorderSide(color: EndUserColors.border),
             ),
@@ -52,33 +70,54 @@ class MarketPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Security Token Marketplace',
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                const Text(
+                  'Security Token Marketplace',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('Invest in tokenized real-world assets with USDT',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14)),
+                Text(
+                  'Invest in tokenized real-world assets with USDT',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 14,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
                     _StatChip(label: '5 Products', icon: Icons.token_rounded),
                     const SizedBox(width: 12),
-                    _StatChip(label: 'Pay with USDT', icon: Icons.currency_exchange_rounded),
+                    _StatChip(
+                      label: 'Pay with USDT',
+                      icon: Icons.currency_exchange_rounded,
+                    ),
                   ],
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          Text('Available Products',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: EndUserColors.textPrimary)),
+          Text(
+            'Available Products',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: EndUserColors.textPrimary,
+            ),
+          ),
           const SizedBox(height: 12),
-          ...demoProducts.map((product) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: ProductCard(
-                  product: product,
-                  onTap: () => _showCheckout(context, product),
-                ),
-              )),
+          ...demoProducts.map(
+            (product) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ProductCard(
+                product: product,
+                onTap: () => _showCheckout(context, product),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -112,7 +151,14 @@ class _StatChip extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: Colors.white70),
           const SizedBox(width: 6),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );

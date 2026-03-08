@@ -29,11 +29,19 @@ ThemeData buildBankTheme() {
       error: BankColors.red,
     ),
     textTheme: baseText.copyWith(
-      headlineLarge: baseText.headlineLarge?.copyWith(color: BankColors.textPrimary),
-      headlineMedium: baseText.headlineMedium?.copyWith(color: BankColors.textPrimary),
+      headlineLarge: baseText.headlineLarge?.copyWith(
+        color: BankColors.textPrimary,
+      ),
+      headlineMedium: baseText.headlineMedium?.copyWith(
+        color: BankColors.textPrimary,
+      ),
       bodyLarge: baseText.bodyLarge?.copyWith(color: BankColors.textPrimary),
-      bodyMedium: baseText.bodyMedium?.copyWith(color: BankColors.textSecondary),
-      labelSmall: baseText.labelSmall?.copyWith(color: BankColors.textSecondary),
+      bodyMedium: baseText.bodyMedium?.copyWith(
+        color: BankColors.textSecondary,
+      ),
+      labelSmall: baseText.labelSmall?.copyWith(
+        color: BankColors.textSecondary,
+      ),
     ),
     cardTheme: CardThemeData(
       color: BankColors.surface,
@@ -47,6 +55,14 @@ ThemeData buildBankTheme() {
   );
 }
 
-TextStyle bankMono({double size = 14, Color color = BankColors.textPrimary, FontWeight weight = FontWeight.w500}) {
-  return GoogleFonts.robotoMono(fontSize: size, color: color, fontWeight: weight);
+TextStyle bankMono({
+  double size = 14,
+  Color color = BankColors.textPrimary,
+  FontWeight weight = FontWeight.w500,
+}) {
+  return GoogleFonts.robotoMono(
+    fontSize: size,
+    color: color,
+    fontWeight: weight,
+  );
 }

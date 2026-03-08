@@ -34,7 +34,11 @@ class _DemoAppState extends State<DemoApp> {
     return MaterialApp(
       title: 'Treasury Gateway Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, brightness: Brightness.dark, scaffoldBackgroundColor: const Color(0xFF0B1017)),
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0B1017),
+      ),
       home: Scaffold(
         body: Row(
           children: [
@@ -79,11 +83,19 @@ class _PhoneMockup extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 12),
             child: Row(
               children: [
-                Icon(Icons.phone_android_rounded, size: 16, color: Color(0xFF6B7280)),
+                Icon(
+                  Icons.phone_android_rounded,
+                  size: 16,
+                  color: Color(0xFF6B7280),
+                ),
                 SizedBox(width: 6),
                 Text(
                   'End-User Mobile App',
-                  style: TextStyle(color: Color(0xFF6B7280), fontSize: 12, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),

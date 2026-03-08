@@ -28,10 +28,16 @@ ThemeData buildEndUserTheme() {
       error: EndUserColors.red,
     ),
     textTheme: baseText.copyWith(
-      headlineLarge: baseText.headlineLarge?.copyWith(color: EndUserColors.textPrimary),
-      headlineMedium: baseText.headlineMedium?.copyWith(color: EndUserColors.textPrimary),
+      headlineLarge: baseText.headlineLarge?.copyWith(
+        color: EndUserColors.textPrimary,
+      ),
+      headlineMedium: baseText.headlineMedium?.copyWith(
+        color: EndUserColors.textPrimary,
+      ),
       bodyLarge: baseText.bodyLarge?.copyWith(color: EndUserColors.textPrimary),
-      bodyMedium: baseText.bodyMedium?.copyWith(color: EndUserColors.textSecondary),
+      bodyMedium: baseText.bodyMedium?.copyWith(
+        color: EndUserColors.textSecondary,
+      ),
     ),
     cardTheme: CardThemeData(
       color: EndUserColors.surface,
@@ -51,6 +57,14 @@ ThemeData buildEndUserTheme() {
   );
 }
 
-TextStyle endUserMono({double size = 14, Color color = EndUserColors.textPrimary, FontWeight weight = FontWeight.w500}) {
-  return GoogleFonts.robotoMono(fontSize: size, color: color, fontWeight: weight);
+TextStyle endUserMono({
+  double size = 14,
+  Color color = EndUserColors.textPrimary,
+  FontWeight weight = FontWeight.w500,
+}) {
+  return GoogleFonts.robotoMono(
+    fontSize: size,
+    color: color,
+    fontWeight: weight,
+  );
 }

@@ -18,14 +18,18 @@ class BridgeMonitor extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.swap_horiz_rounded, size: 18, color: BankColors.accent),
+                const Icon(
+                  Icons.swap_horiz_rounded,
+                  size: 18,
+                  color: BankColors.accent,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Real-time Bridge Monitor',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: BankColors.textPrimary,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: BankColors.textPrimary,
+                  ),
                 ),
                 const Spacer(),
                 _LiveBadge(),
@@ -39,13 +43,17 @@ class BridgeMonitor extends StatelessWidget {
                   ? Center(
                       child: Text(
                         'Waiting for bridge transactions…',
-                        style: bankMono(size: 13, color: BankColors.textSecondary),
+                        style: bankMono(
+                          size: 13,
+                          color: BankColors.textSecondary,
+                        ),
                       ),
                     )
                   : ListView.separated(
                       itemCount: transactions.length,
                       separatorBuilder: (_, __) => const Divider(height: 1),
-                      itemBuilder: (context, index) => _buildRow(context, transactions[index]),
+                      itemBuilder: (context, index) =>
+                          _buildRow(context, transactions[index]),
                     ),
             ),
           ],
@@ -55,7 +63,12 @@ class BridgeMonitor extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    const style = TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: BankColors.textSecondary, letterSpacing: 0.5);
+    const style = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+      color: BankColors.textSecondary,
+      letterSpacing: 0.5,
+    );
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -77,9 +90,27 @@ class BridgeMonitor extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          SizedBox(width: 120, child: Text(timeStr, style: bankMono(size: 12, color: BankColors.textSecondary))),
-          SizedBox(width: 140, child: Text(tx.publicTxHash, style: bankMono(size: 12, color: BankColors.accent))),
-          SizedBox(width: 140, child: Text(amountStr, style: bankMono(size: 12, weight: FontWeight.w600))),
+          SizedBox(
+            width: 120,
+            child: Text(
+              timeStr,
+              style: bankMono(size: 12, color: BankColors.textSecondary),
+            ),
+          ),
+          SizedBox(
+            width: 140,
+            child: Text(
+              tx.publicTxHash,
+              style: bankMono(size: 12, color: BankColors.accent),
+            ),
+          ),
+          SizedBox(
+            width: 140,
+            child: Text(
+              amountStr,
+              style: bankMono(size: 12, weight: FontWeight.w600),
+            ),
+          ),
           Expanded(child: _BridgeStatusIndicator(status: tx.status)),
         ],
       ),
@@ -106,9 +137,23 @@ class _LiveBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(width: 6, height: 6, decoration: const BoxDecoration(shape: BoxShape.circle, color: BankColors.emerald)),
+          Container(
+            width: 6,
+            height: 6,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: BankColors.emerald,
+            ),
+          ),
           const SizedBox(width: 4),
-          Text('LIVE', style: bankMono(size: 10, color: BankColors.emerald, weight: FontWeight.w700)),
+          Text(
+            'LIVE',
+            style: bankMono(
+              size: 10,
+              color: BankColors.emerald,
+              weight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -166,15 +211,25 @@ class _BridgeStatusIndicator extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         border: isCurrent ? Border.all(color: fg.withValues(alpha: 0.3)) : null,
       ),
-      child: Text(label, style: bankMono(size: 10, color: fg, weight: isCurrent ? FontWeight.w600 : FontWeight.w400)),
+      child: Text(
+        label,
+        style: bankMono(
+          size: 10,
+          color: fg,
+          weight: isCurrent ? FontWeight.w600 : FontWeight.w400,
+        ),
+      ),
     );
   }
 
   Widget _connector(bool active) {
     return Container(
-      width: 16, height: 1.5,
+      width: 16,
+      height: 1.5,
       margin: const EdgeInsets.symmetric(horizontal: 2),
-      color: active ? BankColors.accent.withValues(alpha: 0.5) : BankColors.border,
+      color: active
+          ? BankColors.accent.withValues(alpha: 0.5)
+          : BankColors.border,
     );
   }
 }

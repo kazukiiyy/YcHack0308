@@ -8,7 +8,11 @@ class StMarketAllocation extends StatelessWidget {
 
   const StMarketAllocation({super.key, required this.allocations});
 
-  static const _colors = [BankColors.accent, BankColors.emerald, BankColors.amber];
+  static const _colors = [
+    BankColors.accent,
+    BankColors.emerald,
+    BankColors.amber,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -20,16 +24,31 @@ class StMarketAllocation extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.pie_chart_rounded, size: 18, color: BankColors.accent),
+                const Icon(
+                  Icons.pie_chart_rounded,
+                  size: 18,
+                  color: BankColors.accent,
+                ),
                 const SizedBox(width: 8),
-                Text('ST Market Allocation',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: BankColors.textPrimary)),
+                Text(
+                  'ST Market Allocation',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: BankColors.textPrimary,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 20),
             SizedBox(
               height: 160,
-              child: PieChart(PieChartData(sectionsSpace: 2, centerSpaceRadius: 36, sections: _buildSections())),
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 36,
+                  sections: _buildSections(),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             ..._buildLegend(context),
@@ -52,7 +71,11 @@ class StMarketAllocation extends StatelessWidget {
         color: _colors[i % _colors.length],
         radius: 28,
         title: '${pct.toStringAsFixed(0)}%',
-        titleStyle: bankMono(size: 10, color: Colors.white, weight: FontWeight.w700),
+        titleStyle: bankMono(
+          size: 10,
+          color: Colors.white,
+          weight: FontWeight.w700,
+        ),
       );
     });
   }
@@ -63,10 +86,27 @@ class StMarketAllocation extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 6),
         child: Row(
           children: [
-            Container(width: 10, height: 10, decoration: BoxDecoration(color: _colors[i % _colors.length], borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: _colors[i % _colors.length],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: Text(allocations[i].name, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12))),
-            Text(_fmtShort(allocations[i].allocated), style: bankMono(size: 12, weight: FontWeight.w600)),
+            Expanded(
+              child: Text(
+                allocations[i].name,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontSize: 12),
+              ),
+            ),
+            Text(
+              _fmtShort(allocations[i].allocated),
+              style: bankMono(size: 12, weight: FontWeight.w600),
+            ),
           ],
         ),
       );
@@ -74,23 +114,54 @@ class StMarketAllocation extends StatelessWidget {
   }
 
   Widget _buildAllocationTable(BuildContext context) {
-    const headerStyle = TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: BankColors.textSecondary, letterSpacing: 0.5);
+    const headerStyle = TextStyle(
+      fontSize: 10,
+      fontWeight: FontWeight.w600,
+      color: BankColors.textSecondary,
+      letterSpacing: 0.5,
+    );
     return Column(
       children: [
-        const Row(children: [
-          Expanded(child: Text('ASSET', style: headerStyle)),
-          SizedBox(width: 70, child: Text('ALLOCATED', style: headerStyle)),
-          SizedBox(width: 70, child: Text('AVAILABLE', style: headerStyle)),
-        ]),
+        const Row(
+          children: [
+            Expanded(child: Text('ASSET', style: headerStyle)),
+            SizedBox(width: 70, child: Text('ALLOCATED', style: headerStyle)),
+            SizedBox(width: 70, child: Text('AVAILABLE', style: headerStyle)),
+          ],
+        ),
         const SizedBox(height: 8),
-        ...allocations.map((a) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(children: [
-                Expanded(child: Text(a.name, style: const TextStyle(fontSize: 11, color: BankColors.textPrimary))),
-                SizedBox(width: 70, child: Text(_fmtShort(a.allocated), style: bankMono(size: 11))),
-                SizedBox(width: 70, child: Text(_fmtShort(a.available), style: bankMono(size: 11, color: BankColors.emerald))),
-              ]),
-            )),
+        ...allocations.map(
+          (a) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    a.name,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: BankColors.textPrimary,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 70,
+                  child: Text(
+                    _fmtShort(a.allocated),
+                    style: bankMono(size: 11),
+                  ),
+                ),
+                SizedBox(
+                  width: 70,
+                  child: Text(
+                    _fmtShort(a.available),
+                    style: bankMono(size: 11, color: BankColors.emerald),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

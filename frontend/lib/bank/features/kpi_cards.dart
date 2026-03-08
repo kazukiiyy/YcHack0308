@@ -34,7 +34,9 @@ class KpiCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontSize: 12),
                 ),
               ],
             ),
@@ -42,12 +44,14 @@ class KpiCard extends StatelessWidget {
             Text(value, style: bankMono(size: 26, weight: FontWeight.w700)),
             if (subtitle != null) ...[
               const SizedBox(height: 4),
-              Text(subtitle!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12)),
+              Text(
+                subtitle!,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontSize: 12),
+              ),
             ],
-            if (trailing != null) ...[
-              const SizedBox(height: 8),
-              trailing!,
-            ],
+            if (trailing != null) ...[const SizedBox(height: 8), trailing!],
           ],
         ),
       ),
@@ -59,7 +63,11 @@ class SparklineWidget extends StatelessWidget {
   final List<double> data;
   final Color color;
 
-  const SparklineWidget({super.key, required this.data, this.color = BankColors.emerald});
+  const SparklineWidget({
+    super.key,
+    required this.data,
+    this.color = BankColors.emerald,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +77,10 @@ class SparklineWidget extends StatelessWidget {
         height: 32,
         width: 100,
         child: Center(
-          child: Text('No data', style: bankMono(size: 10, color: BankColors.textSecondary)),
+          child: Text(
+            'No data',
+            style: bankMono(size: 10, color: BankColors.textSecondary),
+          ),
         ),
       );
     }
@@ -86,7 +97,10 @@ class SparklineWidget extends StatelessWidget {
           maxY: data.reduce((a, b) => a > b ? a : b) * 1.05,
           lineBarsData: [
             LineChartBarData(
-              spots: List.generate(data.length, (i) => FlSpot(i.toDouble(), data[i])),
+              spots: List.generate(
+                data.length,
+                (i) => FlSpot(i.toDouble(), data[i]),
+              ),
               isCurved: true,
               color: color,
               barWidth: 2,
@@ -109,7 +123,11 @@ class NetworkStatusIndicator extends StatelessWidget {
   final String label;
   final bool isOnline;
 
-  const NetworkStatusIndicator({super.key, required this.label, this.isOnline = true});
+  const NetworkStatusIndicator({
+    super.key,
+    required this.label,
+    this.isOnline = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +142,8 @@ class NetworkStatusIndicator extends StatelessWidget {
             color: isOnline ? BankColors.emerald : BankColors.red,
             boxShadow: [
               BoxShadow(
-                color: (isOnline ? BankColors.emerald : BankColors.red).withValues(alpha: 0.5),
+                color: (isOnline ? BankColors.emerald : BankColors.red)
+                    .withValues(alpha: 0.5),
                 blurRadius: 6,
                 spreadRadius: 1,
               ),

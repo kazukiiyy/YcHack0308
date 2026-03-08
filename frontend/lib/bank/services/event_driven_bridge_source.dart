@@ -91,13 +91,17 @@ class EventDrivenBridgeSource implements BridgeDataSource {
 
   void _emit() {
     if (_controller.isClosed) return;
-    final active = _txList.where((t) => t.status != BridgeStatus.credited).length;
-    _controller.add(DashboardSnapshot(
-      totalLiquidityInflow: _totalInflow,
-      inflowSparkline: List.unmodifiable(_sparkline),
-      activeBridgeTransactions: active,
-      volume24h: _volume24h,
-      recentTransactions: List.unmodifiable(_txList.take(20).toList()),
-    ));
+    final active = _txList
+        .where((t) => t.status != BridgeStatus.credited)
+        .length;
+    _controller.add(
+      DashboardSnapshot(
+        totalLiquidityInflow: _totalInflow,
+        inflowSparkline: List.unmodifiable(_sparkline),
+        activeBridgeTransactions: active,
+        volume24h: _volume24h,
+        recentTransactions: List.unmodifiable(_txList.take(20).toList()),
+      ),
+    );
   }
 }
