@@ -1,0 +1,9 @@
+{
+  "network": "quorum-private",
+  "deployedAt": "2026-03-08T06:47:04.084Z",
+  "contracts": {
+    "USDCp": "0x49f8866d90ffDa8B12AC5677966e963acEc6d80E",
+    "PrivateBridge": "0x1ADB4e782226cf66FF065FDF2D52B1ee7D831A64"
+  },
+  "deployer": "0xC9C913c8c3C1Cd416d80A0abF475db2062F161f6"
+}
