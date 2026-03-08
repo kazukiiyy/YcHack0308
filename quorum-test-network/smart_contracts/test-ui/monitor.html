@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge Monitor - Real-time Events</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #070711;
+            --surface: #0f0f1a;
+            --border: #1e1e30;
+            --text: #e2e8f0;
+            --muted: #4a5568;
+            --deposit: #10b981;
+            --withdraw: #f59e0b;
+            --transfer: #6366f1;
+            --mint: #22d3ee;
+            --burn: #f87171;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-left p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .status-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .pill.connecting {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+        }
+
+        .pill.connected {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .pill.error {
+            background: rgba(248, 113, 113, 0.1);
+            border-color: rgba(248, 113, 113, 0.3);
+            color: #f87171;
+        }
+
+        .pill-dot.connecting {
+            background: #818cf8;
+            animation: pulse 1.5s infinite;
+        }
+
+        .pill-dot.connected {
+            background: #10b981;
+        }
+
+        .pill-dot.error {
+            background: #f87171;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Stats Row */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-value.deposit {
+            color: var(--deposit);
+        }
+
+        .stat-value.withdraw {
+            color: var(--withdraw);
+        }
+
+        .stat-value.transfer {
+            color: var(--transfer);
+        }
+
+        .stat-value.total {
+            color: var(--text);
+        }
+
+        .stat-unit {
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: 4px;
+            font-weight: 400;
+        }
+
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 16px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Feed */
+        .feed-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .feed-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .clear-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .clear-btn:hover {
+            border-color: #4a5568;
+            color: var(--text);
+        }
+
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .event-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            animation: slideIn 0.3s ease;
+            border-left: 3px solid;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .event-card.DEPOSIT_PROCESSED {
+            border-left-color: var(--deposit);
+        }
+
+        .event-card.WITHDRAW_REQUESTED {
+            border-left-color: var(--withdraw);
+        }
+
+        .event-card.TRANSFER {
+            border-left-color: var(--transfer);
+        }
+
+        .event-card.MINT {
+            border-left-color: var(--mint);
+        }
+
+        .event-card.BURN {
+            border-left-color: var(--burn);
+        }
+
+        .event-card.UNLOCKED {
+            border-left-color: var(--deposit);
+        }
+
+        .event-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .event-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .DEPOSIT_PROCESSED .event-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--deposit);
+        }
+
+        .WITHDRAW_REQUESTED .event-badge {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--withdraw);
+        }
+
+        .TRANSFER .event-badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--transfer);
+        }
+
+        .MINT .event-badge {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--mint);
+        }
+
+        .BURN .event-badge {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--burn);
+        }
+
+        .UNLOCKED .event-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--deposit);
+        }
+
+        .event-time {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .event-amount {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 8px;
+        }
+
+        .DEPOSIT_PROCESSED .event-amount,
+        .MINT .event-amount,
+        .UNLOCKED .event-amount {
+            color: var(--deposit);
+        }
+
+        .WITHDRAW_REQUESTED .event-amount,
+        .BURN .event-amount {
+            color: var(--withdraw);
+        }
+
+        .TRANSFER .event-amount {
+            color: var(--transfer);
+        }
+
+        .event-amount .unit {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .event-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .meta-key {
+            color: var(--muted);
+            min-width: 60px;
+        }
+
+        .meta-val {
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 300px;
+        }
+
+        .tx-link {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        .tx-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            color: var(--muted);
+        }
+
+        .empty-state .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 12px;
+        }
+
+        .contract-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .contract-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .contract-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .contract-addr {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #6366f1;
+            word-break: break-all;
+        }
+
+        .log-list {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-entry {
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--muted);
+            padding: 3px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .log-entry.ok {
+            color: #10b981;
+        }
+
+        .log-entry.err {
+            color: #f87171;
+        }
+
+        .log-entry.info {
+            color: #818cf8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>⛓ Bridge Event Monitor</h1>
+            <p>Private Chain (Quorum) + Sepolia リアルタイム表示</p>
+        </div>
+        <div class="status-pills">
+            <div class="pill connecting" id="pillPrivate">
+                <div class="pill-dot connecting" id="dotPrivate"></div>
+                <span id="lblPrivate">Private Chain 接続中...</span>
+            </div>
+            <div class="pill connecting" id="pillSepolia">
+                <div class="pill-dot connecting" id="dotSepolia"></div>
+                <span id="lblSepolia">Sepolia 接続中...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">受取 (Deposit)</div>
+            <div class="stat-value deposit" id="statDeposit">0.00<span class="stat-unit">USDCp</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">送出 (Withdraw)</div>
+            <div class="stat-value withdraw" id="statWithdraw">0.00<span class="stat-unit">USDC</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Unlocked (Sepolia)</div>
+            <div class="stat-value deposit" id="statUnlocked">0.00<span class="stat-unit">USDC</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">イベント総数</div>
+            <div class="stat-value total" id="statTotal">0</div>
+        </div>
+    </div>
+
+    <div class="layout">
+        <!-- Main Feed -->
+        <div>
+            <div class="feed-header">
+                <span class="feed-title">📡 ライブフィード</span>
+                <button class="clear-btn" onclick="clearFeed()">クリア</button>
+            </div>
+            <div id="feed" class="feed">
+                <div class="empty-state" id="emptyState">
+                    <div class="icon">👂</div>
+                    <p>イベント待機中...<br>ブリッジトランザクションが発生するとここに表示されます</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">コントラクト</div>
+                <div class="contract-row">
+                    <div class="contract-name">PrivateBridgeV2 (Quorum)</div>
+                    <div class="contract-addr">0x836114F71F13321808D9CAd370D1f5c5158f09cE</div>
+                </div>
+                <div class="contract-row">
+                    <div class="contract-name">USDCpV2 (Quorum)</div>
+                    <div class="contract-addr">0xBe5e64248757D402a596c0C5A7742ccAdA270aeC</div>
+                </div>
+                <div class="contract-row">
+                    <div class="contract-name">BridgeVault (Sepolia)</div>
+                    <div class="contract-addr">0xE69606565988E8A2bC9048ec22645670164Fab96</div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="sidebar-title">接続ログ</div>
+                <div class="log-list" id="logList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <script>
+        // ─── Config ───────────────────────────────────────────────────
+        const PRIVATE_WS = 'ws://127.0.0.1:8546';
+        const PRIVATE_HTTP = 'http://127.0.0.1:8545';
+        const SEPOLIA_HTTP = 'https://ethereum-sepolia-rpc.publicnode.com';
+
+        const BRIDGE_V2_ADDR = '0x836114F71F13321808D9CAd370D1f5c5158f09cE';
+        const USDCP_ADDR = '0xBe5e64248757D402a596c0C5A7742ccAdA270aeC';
+        const VAULT_ADDR = '0xE69606565988E8A2bC9048ec22645670164Fab96';
+
+        const BRIDGE_ABI = [
+            'event DepositProcessed(bytes32 indexed depositId, address indexed recipient, uint256 amount, bytes32 publicChainTxHash)',
+            'event WithdrawRequested(bytes32 indexed withdrawId, address indexed from, uint256 amount, address publicChainRecipient)',
+        ];
+        const USDCP_ABI = [
+            'event Transfer(address indexed from, address indexed to, uint256 value)',
+            'event Mint(address indexed to, uint256 amount, bytes32 indexed depositId)',
+            'event Burn(address indexed from, uint256 amount, bytes32 indexed withdrawId)',
+        ];
+        const VAULT_ABI = [
+            'event Locked(address indexed sender, uint256 amount, bytes32 privateChainRecipient, uint256 nonce)',
+            'event Unlocked(bytes32 indexed privateTxHash, address indexed recipient, uint256 amount)',
+        ];
+
+        // ─── State ────────────────────────────────────────────────────
+        let totalDeposit = 0, totalWithdraw = 0, totalUnlocked = 0, totalEvents = 0;
+        let events = [];
+
+        // ─── Logging ─────────────────────────────────────────────────
+        function log(msg, type = 'info') {
+            const el = document.getElementById('logList');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `${new Date().toLocaleTimeString('ja-JP')} ${msg}`;
+            el.insertBefore(entry, el.firstChild);
+            if (el.children.length > 50) el.removeChild(el.lastChild);
+        }
+
+        // ─── Pill status ─────────────────────────────────────────────
+        function setPillStatus(id, status, label) {
+            const pill = document.getElementById('pill' + id);
+            const dot = document.getElementById('dot' + id);
+            const lbl = document.getElementById('lbl' + id);
+            pill.className = `pill ${status}`;
+            dot.className = `pill-dot ${status}`;
+            lbl.textContent = label;
+        }
+
+        // ─── Render event ────────────────────────────────────────────
+        function fmt(address) {
+            return address.slice(0, 6) + '…' + address.slice(-4);
+        }
+
+        function addEvent(type, amount, amountUnit, metaRows, txHash, chain) {
+            totalEvents++;
+            document.getElementById('statTotal').textContent = totalEvents;
+            document.getElementById('emptyState')?.remove();
+
+            const timeStr = new Date().toLocaleTimeString('ja-JP');
+            const card = document.createElement('div');
+            card.className = `event-card ${type}`;
+
+            const chainLabel = chain === 'private' ? '🔒 Private' : '🌐 Sepolia';
+            const explorerBase = chain === 'sepolia'
+                ? 'https://sepolia.etherscan.io/tx/'
+                : `http://localhost:25000/tx/`;
+
+            const metaHTML = metaRows.map(([k, v]) =>
+                `<div class="meta-row"><span class="meta-key">${k}</span><span class="meta-val" title="${v}">${v}</span></div>`
+            ).join('');
+
+            card.innerHTML = `
+        <div class="event-top">
+          <span class="event-badge">${type.replace('_', ' ')}</span>
+          <span class="event-time">${chainLabel} · ${timeStr}</span>
+        </div>
+        <div class="event-amount">${amount}<span class="unit"> ${amountUnit}</span></div>
+        <div class="event-meta">
+          ${metaHTML}
+          <div class="meta-row">
+            <span class="meta-key">TX</span>
+            <span class="meta-val">
+              <a class="tx-link" href="${explorerBase}${txHash}" target="_blank">${fmt(txHash)}</a>
+            </span>
+          </div>
+        </div>
+      `;
+
+            const feed = document.getElementById('feed');
+            feed.insertBefore(card, feed.firstChild);
+
+            // Keep max 50 cards
+            while (feed.children.length > 50) feed.removeChild(feed.lastChild);
+        }
+
+        // ─── Private Chain Listener ───────────────────────────────────
+        async function startPrivateListener() {
+            setPillStatus('Private', 'connecting', 'Private Chain 接続中...');
+            log('Private Chain WebSocketに接続中...');
+
+            let provider;
+            try {
+                provider = new ethers.WebSocketProvider(PRIVATE_WS);
+                await provider.getBlockNumber();
+                setPillStatus('Private', 'connected', `Private Chain ✓`);
+                log('Private Chain 接続成功', 'ok');
+            } catch (e) {
+                log('WebSocket失敗、HTTP pollingに切替', 'err');
+                provider = new ethers.JsonRpcProvider(PRIVATE_HTTP);
+                setPillStatus('Private', 'connected', 'Private Chain (HTTP)');
+            }
+
+            const bridge = new ethers.Contract(BRIDGE_V2_ADDR, BRIDGE_ABI, provider);
+            const usdcp = new ethers.Contract(USDCP_ADDR, USDCP_ABI, provider);
+
+            bridge.on('DepositProcessed', (depositId, recipient, amount, publicTxHash, event) => {
+                const formatted = parseFloat(ethers.formatUnits(amount, 6));
+                totalDeposit += formatted;
+                document.getElementById('statDeposit').innerHTML =
+                    totalDeposit.toFixed(2) + '<span class="stat-unit">USDCp</span>';
+                addEvent('DEPOSIT_PROCESSED', formatted.toFixed(2), 'USDCp', [
+                    ['To', fmt(recipient)],
+                    ['DepositID', fmt(depositId)],
+                ], event.log.transactionHash, 'private');
+                log(`DepositProcessed: +${formatted} USDCp → ${fmt(recipient)}`, 'ok');
+            });
+
+            bridge.on('WithdrawRequested', (withdrawId, from, amount, publicRecipient, event) => {
+                const formatted = parseFloat(ethers.formatUnits(amount, 6));
+                totalWithdraw += formatted;
+                document.getElementById('statWithdraw').innerHTML =
+                    totalWithdraw.toFixed(2) + '<span class="stat-unit">USDC</span>';
+                addEvent('WITHDRAW_REQUESTED', formatted.toFixed(2), 'USDCp burned', [
+                    ['From', fmt(from)],
+                    ['EthRecipient', fmt(publicRecipient)],
+                ], event.log.transactionHash, 'private');
+                log(`WithdrawRequested: ${formatted} USDCp from ${fmt(from)}`, 'info');
+            });
+
+            usdcp.on('Mint', (to, amount, depositId, event) => {
+                const formatted = parseFloat(ethers.formatUnits(amount, 6));
+                addEvent('MINT', '+' + formatted.toFixed(2), 'USDCp', [
+                    ['To', fmt(to)],
+                ], event.log.transactionHash, 'private');
+            });
+
+            usdcp.on('Burn', (from, amount, withdrawId, event) => {
+                const formatted = parseFloat(ethers.formatUnits(amount, 6));
+                addEvent('BURN', '-' + formatted.toFixed(2), 'USDCp', [
+                    ['From', fmt(from)],
+                ], event.log.transactionHash, 'private');
+            });
+
+            log('Private Chainイベント監視開始', 'ok');
+        }
+
+        // ─── Sepolia Listener (HTTP polling) ─────────────────────────
+        async function startSepoliaListener() {
+            setPillStatus('Sepolia', 'connecting', 'Sepolia 接続中...');
+            log('Sepolia に接続中...');
+
+            const provider = new ethers.JsonRpcProvider(SEPOLIA_HTTP);
+            try {
+                await provider.getBlockNumber();
+                setPillStatus('Sepolia', 'connected', 'Sepolia ✓ (polling)');
+                log('Sepolia 接続成功', 'ok');
+            } catch (e) {
+                setPillStatus('Sepolia', 'error', 'Sepolia 接続失敗');
+                log('Sepolia 接続失敗: ' + e.message, 'err');
+                return;
+            }
+
+            const vault = new ethers.Contract(VAULT_ADDR, VAULT_ABI, provider);
+            let lastBlock = await provider.getBlockNumber();
+            log(`Sepolia監視開始 (block ${lastBlock})`, 'ok');
+
+            // Poll every 8 seconds
+            setInterval(async () => {
+                try {
+                    const newBlock = await provider.getBlockNumber();
+                    if (newBlock <= lastBlock) return;
+
+                    // Locked events
+                    const locked = await vault.queryFilter(vault.filters.Locked(), lastBlock + 1, newBlock);
+                    for (const ev of locked) {
+                        const amount = parseFloat(ethers.formatUnits(ev.args[1], 6));
+                        addEvent('DEPOSIT_PROCESSED', amount.toFixed(2), 'USDC locked', [
+                            ['Sender', fmt(ev.args[0])],
+                            ['Nonce', ev.args[3].toString()],
+                        ], ev.transactionHash, 'sepolia');
+                        log(`Sepolia Locked: ${amount} USDC from ${fmt(ev.args[0])}`, 'info');
+                    }
+
+                    // Unlocked events
+                    const unlocked = await vault.queryFilter(vault.filters.Unlocked(), lastBlock + 1, newBlock);
+                    for (const ev of unlocked) {
+                        const amount = parseFloat(ethers.formatUnits(ev.args[2], 6));
+                        totalUnlocked += amount;
+                        document.getElementById('statUnlocked').innerHTML =
+                            totalUnlocked.toFixed(2) + '<span class="stat-unit">USDC</span>';
+                        addEvent('UNLOCKED', amount.toFixed(2), 'USDC', [
+                            ['Recipient', fmt(ev.args[1])],
+                            ['PrivateTx', fmt(ev.args[0])],
+                        ], ev.transactionHash, 'sepolia');
+                        log(`Sepolia Unlocked: ${amount} USDC → ${fmt(ev.args[1])}`, 'ok');
+                    }
+
+                    lastBlock = newBlock;
+                } catch (e) {
+                    log('Sepoliaポーリングエラー: ' + e.message, 'err');
+                }
+            }, 8000);
+        }
+
+        function clearFeed() {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = '<div class="empty-state" id="emptyState"><div class="icon">👂</div><p>クリアされました。次のイベントを待機中...</p></div>';
+            totalDeposit = totalWithdraw = totalUnlocked = totalEvents = 0;
+            document.getElementById('statDeposit').innerHTML = '0.00<span class="stat-unit">USDCp</span>';
+            document.getElementById('statWithdraw').innerHTML = '0.00<span class="stat-unit">USDC</span>';
+            document.getElementById('statUnlocked').innerHTML = '0.00<span class="stat-unit">USDC</span>';
+            document.getElementById('statTotal').textContent = '0';
+        }
+
+        // ─── Start ────────────────────────────────────────────────────
+        startPrivateListener().catch(e => {
+            setPillStatus('Private', 'error', 'Private Chain エラー');
+            log('Private Chainエラー: ' + e.message, 'err');
+        });
+        startSepoliaListener().catch(e => {
+            setPillStatus('Sepolia', 'error', 'Sepolia エラー');
+            log('Sepoliaエラー: ' + e.message, 'err');
+        });
+    </script>
+</body>
+
+</html>
